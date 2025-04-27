@@ -38,6 +38,10 @@ def get_file_mapping(system_folders: dict):
         ".mov": system_folders["Videos"],
         ".avi": system_folders["Videos"],
     }
+
+    
+def organize_desktop_files():
+    desktop = Path.home() / "Desktop"
     
     
 def main():
