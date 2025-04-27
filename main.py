@@ -16,6 +16,12 @@ def get_system_folders():
         "Music": home / "Music",
         "Videos": home / "Videos",
     }
+    
+    
+def get_file_mapping(system_folders: dict):
+    pass
+    
+    
 def main():
     get_system_folders()
 
