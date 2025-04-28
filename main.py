@@ -41,11 +41,21 @@ def get_file_mapping(system_folders: dict):
 
     
 def organize_desktop_files():
+    
     desktop = Path.home() / "Desktop"
+    
+    if not desktop.exists():
+        return
+    
+    system_folders = get_system_folders()
+    file_mapping = get_file_mapping(system_folders)
+    
+    for item in desktop.iterdir():
+        print(item.is_file())
     
     
 def main():
-    get_system_folders()
-
+    print("Still working fine...")
+    organize_desktop_files()
 if __name__=="__main__":
     main()
