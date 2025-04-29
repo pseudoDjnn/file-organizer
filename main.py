@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 def get_desktop_defaults():
