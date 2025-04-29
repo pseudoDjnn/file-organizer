@@ -31,6 +31,20 @@ def get_active_desktop(desktop_defaults: dict):
         return desktop_defaults["WindowsOS"]
     else:
         raise FileNotFoundError("No valid entry...")
+    
+def get_system_folder_path(onedrive_directory=True):
+
+    if onedrive_directory:
+        directory_to_use = Path("mnt/c/Users/lavah/OneDrive/")
+    else:
+        directory_to_use = Path("mnt/c/Users/lavah/")
+        
+        return {
+            "Documents": directory_to_use / "Documents",
+            "Pictures": directory_to_use / "Pictures",
+            "Music": directory_to_use / "Music",
+            "Videos": directory_to_use / "Videos",
+        }
 
 def main():
     # Get candidate desktop defaults
