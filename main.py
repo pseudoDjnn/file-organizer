@@ -2,54 +2,44 @@ from pathlib import Path
 
 def get_desktop_defaults():
     
-    one_drive_desktop = Path("/mnt/c/Users/lavah/OneDrive/Desktop")
-    standard_desktop = Path("/mnt/c/Users/lavah/Desktop")
+    paths_for_clients = {
+        "OneDrive": Path("/mnt/c/Users/lavah/OneDrive/Desktop"),
+        "WindowsOS": Path("/mnt/c/Users/lavah/Desktop")
+    }
     
     desktop_defaults = {}
     
-    if one_drive_desktop.exists():
-        desktop_defaults["OneDriveDesktop"] = one_drive_desktop
-    else:
-        print(f"OneDrive not found at {one_drive_desktop}")
+    for key, path in paths_for_clients.items():
+        try:
+            if path.exists():
+                desktop_defaults[key] = path
+        except Exception as e:
+            raise Exception(f"Error checking {key} at {path}: {e}")
     
-    if standard_desktop.exists():
-        desktop_defaults["StandardDesktop"] = standard_desktop
-    else:
-        print(f"Desktop not found at {standard_desktop}")
     
+    if not desktop_defaults:
+        raise FileNotFoundError("Path not found: {key} or {path}")
     return desktop_defaults
 
 def get_active_desktop(desktop_defaults: dict):
     
-    if "OneDriveDesktop" in desktop_defaults:
-        print("Using OneDrive:", desktop_defaults["OneDriveDesktop"])
-        return desktop_defaults["OneDriveDesktop"]
-    elif "StandardDesktop" in desktop_defaults:
-        print("Using Desktop:", desktop_defaults["StandardDesktop"])
-        return desktop_defaults["StandardDesktop"]
+    if "OneDrive" in desktop_defaults:
+        # print("Using OneDrive:", desktop_defaults["OneDriveDesktop"])
+        return desktop_defaults["OneDrive"]
+    elif "WindowsOS" in desktop_defaults:
+        # print("Using Desktop:", desktop_defaults["StandardDesktop"])
+        return desktop_defaults["WindowsOS"]
     else:
-        print("No Desktop found...")
-        return None
+        raise FileNotFoundError("No valid entry...")
 
 def main():
     # Get candidate desktop defaults
     desktop_defaults = get_desktop_defaults()
     # print(f"DEBUGGING", desktop_defaults)
+
+    clients_active_desktop = get_active_desktop(desktop_defaults)
+    print(f"Now Running on {clients_active_desktop}")    
     
-    # Print the defaults
-    if desktop_defaults:
-        print("Your Desktop has been found:")
-        for key, path in desktop_defaults.items():
-            print(f"  {key}: {path}")
-    else:
-        print("No candidate Desktop directories were found.")
-    
-    # # Choose and print the active desktop directory.
-    active_desktop = get_active_desktop(desktop_defaults)
-    if active_desktop:
-        print("Active Desktop directory is:", active_desktop)
-    else:
-        print("Aborting: No active Desktop directory found.")
 
 if __name__ == "__main__":
     main()
