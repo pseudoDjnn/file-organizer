@@ -37,10 +37,13 @@ def organize_files(directory):
             
         if not file_moved:
             shutil.move(file_path, os.path.join(directory, "Others", filename))
+            
 
 
 def main():
-    pass
+    directory_to_organize = input("Enter the directory path to organize: ")
+    organize_files(directory_to_organize)
+
     
-if __name__ == "__main__":
+if __name__ == "__main__": 
     main()
