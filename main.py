@@ -18,13 +18,18 @@ def organize_files(directory):
     if not os.path.isdir(directory):
         raise Exception(f"Error: {directory} is not a valid directory")
 
+    # Craet category directories if they don't exist
+    
     for category in FILE_CATEGORIES:
         folder_path = os.path.join(directory, category)
         os.makedirs(folder_path, exist_ok=True)
         
+    # Process files in the directory
+    
     for filename in os.listdir(directory):
         file_path = os.path.join(directory, filename)
         
+        # Skip existing directories
         if os.path.isdir(file_path):
             continue
 
