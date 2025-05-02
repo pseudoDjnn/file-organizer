@@ -26,6 +26,7 @@ def organize_files(directory):
         folder_path = os.path.join(directory, category)
         os.makedirs(folder_path, exist_ok=True)
         
+    # Store moved file for undo func
     moved_files = []
         
     # Process files in the directory
@@ -51,6 +52,7 @@ def organize_files(directory):
             shutil.move(file_path, destination)
             moved_files.append((file_path, destination))
             
+    # Save the undo log is files were moved
     if moved_files:
         with open(UNDO_LOG_FILE, "w") as undo_file:
             for original, new in moved_files:
