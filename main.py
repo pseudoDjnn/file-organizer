@@ -1,6 +1,8 @@
 import os
 import shutil
 
+UNDO_LOG_FILE = "undo_log.txt"
+
 FILE_CATEGORIES = {
     "Documents": [".pdf", ".doc", ".docx", ".txt"],
     "Pictures": [".jpg", ".jpeg", ".png", ".gif"],
@@ -24,6 +26,8 @@ def organize_files(directory):
         folder_path = os.path.join(directory, category)
         os.makedirs(folder_path, exist_ok=True)
         
+    moved_files = []
+        
     # Process files in the directory
     
     for filename in os.listdir(directory):
@@ -36,12 +40,23 @@ def organize_files(directory):
         file_moved = False
         for category, extentions in FILE_CATEGORIES.items():
             if any(filename.lower().endswith(ext) for ext in extentions):
-                shutil.move(file_path, os.path.join(directory, category, filename))
+                destination = os.path.join(directory, category, filename)
+                shutil.move(file_path, destination)
+                moved_files.append((file_path, destination))
                 file_moved = True
                 break
             
         if not file_moved:
-            shutil.move(file_path, os.path.join(directory, "Others", filename))
+            destination = os.path.join(directory, "Others", filename)
+            shutil.move(file_path, destination)
+            moved_files.append((file_path, destination))
+            
+    if moved_files:
+        with open(UNDO_LOG_FILE, "w") as undo_file:
+            for original, new in moved_files:
+                undo_file.write(f"{original}|{new}\n")
+                
+        print(f"Undo log saved: {UNDO_LOG_FILE}")
             
 
 
