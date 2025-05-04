@@ -1,8 +1,7 @@
 import os
 import shutil
+import datetime
 
-# Undo history storage name
-# UNDO_LOG_FILE = "undo_log.txt"
 
 FILE_CATEGORIES = {
     "Documents": [".pdf", ".doc", ".docx", ".txt"],
@@ -27,8 +26,6 @@ def organize_files(directory):
         folder_path = os.path.join(directory, category)
         os.makedirs(folder_path, exist_ok=True)
         
-    # Store moved file for undo func
-    # moved_files = []
         
     # Process files in the directory
     
@@ -44,23 +41,12 @@ def organize_files(directory):
             if any(filename.lower().endswith(ext) for ext in extentions):
                 destination = os.path.join(directory, category, filename)
                 shutil.move(file_path, destination)
-                # moved_files.append((file_path, destination))
                 file_moved = True
                 break
             
         if not file_moved:
             destination = os.path.join(directory, "Others", filename)
-            shutil.move(file_path, destination)
-            # moved_files.append((file_path, destination))
-            
-    # # Save the undo log is files were moved
-    # if moved_files:
-    #     with open(UNDO_LOG_FILE, "w") as undo_file:
-    #         for original, new in moved_files:
-    #             undo_file.write(f"{original}|{new}\n")
-                
-    #     print(f"Undo log saved: {UNDO_LOG_FILE}")
-            
+            shutil.move(file_path, destination)            
 
 
 def main():
