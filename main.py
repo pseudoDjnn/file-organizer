@@ -12,10 +12,15 @@ FILE_CATEGORIES = {
     "Data": [".csv", ".json", ".xml"],
     "Others": []
 }
+
+def get_year_subfolder(file_path):
+    modified_timestamp = os.path.getmtime(file_path)
+    modified_date = datetime.datetime.fromtimestamp(modified_timestamp)
+    return str(modified_date.year)
     
 def organize_files(directory):
     """
-    Organizes file sin the given dir based on their file type
+    Organizes files in the given dir based on their file type
     """
     if not os.path.isdir(directory):
         raise Exception(f"Error: {directory} is not a valid directory")
