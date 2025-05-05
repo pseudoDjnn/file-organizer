@@ -13,11 +13,21 @@ FILE_CATEGORIES = {
     "Others": []
 }
 
+YEAR_RANGE = 5
+
 def get_year_subfolder(file_path):
-    modified_timestamp = os.path.getmtime(file_path)
-    modified_date = datetime.datetime.fromtimestamp(modified_timestamp)
-    print(f"File: {file_path} - Modified Year: {modified_date.year}")
-    return str(modified_date.year)
+    try:
+        modified_timestamp = os.path.getmtime(file_path)
+        modified_date = datetime.datetime.fromtimestamp(modified_timestamp)
+        current_year = datetime.datetime.now().year
+        
+        if modified_date.year >= (current_year - YEAR_RANGE) and modified_date.year <= current_year:
+            return str(modified_date.year)
+        else:
+            return "Unknown"
+    except Exception as e:
+        print(f"Error extracting year for {file_path}: {e}")
+        return "Unknown"
     
 def organize_files(directory):
     """
