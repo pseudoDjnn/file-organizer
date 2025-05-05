@@ -35,48 +35,53 @@ def get_year_subfolder(file_path):
         if modified_date.year >= (current_year - YEAR_RANGE) and modified_date.year <= current_year:
             return str(modified_date.year)
         else:
+            # Ignore unexpected dates
             return "Unknown"
+        
     except Exception as e:
         print(f"Error extracting year for {file_path}: {e}")
         return "Unknown"
     
 def organize_files(directory):
     """
-    Organizes files in the given dir based on their file type
+    Organizes files in the given dir based on their file type and subfolders based on date.
+    Raises and error if the path provided is invalid or inaccessible.
     """
     if not os.path.isdir(directory):
         raise Exception(f"Error: {directory} is not a valid directory")
 
-    # Create category directories if they don't exist
+    # Create category directories if they don't exist before organizing
     
     for category in FILE_CATEGORIES:
         folder_path = os.path.join(directory, category)
         os.makedirs(folder_path, exist_ok=True)
-        
         
     # Process files in the directory
     
     for filename in os.listdir(directory):
         file_path = os.path.join(directory, filename)
         
-        # print(f"Processing: {file_path}")
-        
-        # Skip existing directories
+        # Skip existing directories that are not in FILE_CATEGORIES (prevents re-moving)
         if os.path.isdir(file_path) and filename not in FILE_CATEGORIES.keys():
-            # print(f"Skipping unrelated directory: {file_path}")
+            # Skips unrealted folders
             continue
 
+        # Track whether a file has been moved
         file_moved = False
+        
+        # Iterate through FILE_CATEGORIES to mach file extensions
         for category, extentions in FILE_CATEGORIES.items():
             if any(filename.lower().endswith(ext) for ext in extentions):
-                print(f"Matched '{filename}' as '{category}'")
+                # print(f"Matched '{filename}' as '{category}'")
+                # Determine the file's year for correct placement
                 year_subfolder = get_year_subfolder(file_path)
+                # Define the subfolder path within the correct category
                 destination_folder = os.path.join(directory, category, year_subfolder)
-
                 # Ensure category and year subfolder exist
                 os.makedirs(destination_folder, exist_ok=True)
                 print(f"Created/Verified Folder: {destination_folder}")
                 
+                # Move file into its category/year folder
                 destination = os.path.join(destination_folder, filename)
                 shutil.move(file_path, destination)
                 file_moved = True
