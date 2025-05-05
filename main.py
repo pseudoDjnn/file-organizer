@@ -84,11 +84,13 @@ def organize_files(directory):
                 # Move file into its category/year folder
                 destination = os.path.join(destination_folder, filename)
                 shutil.move(file_path, destination)
+                # Mark as moved
                 file_moved = True
+                # Stop searching once a match is found
                 break
             
+        # Place unrecognized files inside of "Others/YYYY"
         if not file_moved:
-            # Default placement for unrecognized files in "Others/YYYY"
             year_subfolder = get_year_subfolder(file_path)
             destination_folder = os.path.join(directory, "Others", year_subfolder)
             
@@ -105,6 +107,9 @@ def organize_files(directory):
 
 
 def main():
+    """
+    Main execution function prompting user for a directory path.
+    """
     directory_to_organize = input("Enter the directory path to organize: ")
     organize_files(directory_to_organize)
 
