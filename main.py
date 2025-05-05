@@ -38,11 +38,11 @@ def organize_files(directory):
     for filename in os.listdir(directory):
         file_path = os.path.join(directory, filename)
         
-        print(f"Processing: {file_path}")
+        # print(f"Processing: {file_path}")
         
         # Skip existing directories
-        if os.path.isdir(file_path):
-            print(f"Skipping directory: {file_path}")
+        if os.path.isdir(file_path) and filename not in FILE_CATEGORIES.keys():
+            # print(f"Skipping unrelated directory: {file_path}")
             continue
 
         file_moved = False
@@ -69,7 +69,13 @@ def organize_files(directory):
             os.makedirs(destination_folder, exist_ok=True)
             
             destination = os.path.join(destination_folder, filename)
-            shutil.move(file_path, destination)            
+            
+            # Only move files, skip directories
+            if not os.path.isdir(file_path):
+                shutil.move(file_path, destination)
+                print(f"Moved '{filename}' to '{destination}'")
+            else:
+                print(f"Skipping move for existing directory: {file_path}")
 
 
 def main():
