@@ -18,7 +18,7 @@ FILE_CATEGORIES = {
 # Defines how may years of files should be organized (past 5 years)
 YEAR_RANGE = 5
 
-def get_year_subfolder(file_path):
+def get_year_month_subfolder(file_path):
     """
     Determines the last modified year of the file.
     Ensures the year falls within a valid range before categorization.
@@ -32,8 +32,11 @@ def get_year_subfolder(file_path):
         current_year = datetime.datetime.now().year
         
         # Ensure the file year falls within the valid YEAR_RANGE
-        if modified_date.year >= (current_year - YEAR_RANGE) and modified_date.year <= current_year:
-            return str(modified_date.year)
+        if (current_year - modified_date.year) <= YEAR_RANGE:
+            # Convert month number to name
+            month_name = modified_date.strftime("%B")
+            
+            return f"{modified_date.year}-{month_name}"
         else:
             # Ignore unexpected dates
             return "Unknown"
