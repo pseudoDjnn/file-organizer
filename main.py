@@ -2,6 +2,7 @@ import os
 import shutil
 import datetime
 
+# Dictionary defining file categories and thier associated extensions
 
 FILE_CATEGORIES = {
     "Documents": [".pdf", ".doc", ".docx", ".txt"],
@@ -10,17 +11,27 @@ FILE_CATEGORIES = {
     "Videos": [".mp4", ".mov", ".avi"],
     "Archives": [".zip", ".rar", ".7z", ".tar"],
     "Data": [".csv", ".json", ".xml"],
+    # Unreognized files will go here
     "Others": []
 }
 
+# Defines how may years of files should be organized (past 5 years)
 YEAR_RANGE = 5
 
 def get_year_subfolder(file_path):
+    """
+    Determines the last modified year of the file.
+    Ensures the year falls within a valid range before categorization.
+    """
     try:
+        # Get modification time
         modified_timestamp = os.path.getmtime(file_path)
+
+        # Conver to date
         modified_date = datetime.datetime.fromtimestamp(modified_timestamp)
         current_year = datetime.datetime.now().year
         
+        # Ensure the file year falls within the valid YEAR_RANGE
         if modified_date.year >= (current_year - YEAR_RANGE) and modified_date.year <= current_year:
             return str(modified_date.year)
         else:
