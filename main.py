@@ -45,6 +45,13 @@ def get_year_month_subfolder(file_path):
         print(f"Error extracting year for {file_path}: {e}")
         return "Unknown"
     
+def create_main_category_folders(directory):
+    # Create category directories if they don't exist before organizing
+    
+    for category in FILE_CATEGORIES:
+        folder_path = os.path.join(directory, category)
+        os.makedirs(folder_path, exist_ok=True)
+    
 def organize_files(directory):
     """
     Organizes files in the given dir based on their file type and subfolders based on date.
@@ -53,11 +60,7 @@ def organize_files(directory):
     if not os.path.isdir(directory):
         raise Exception(f"Error: {directory} is not a valid directory")
 
-    # Create category directories if they don't exist before organizing
-    
-    for category in FILE_CATEGORIES:
-        folder_path = os.path.join(directory, category)
-        os.makedirs(folder_path, exist_ok=True)
+    create_main_category_folders(directory)
         
     # Process files in the directory
     
@@ -77,7 +80,7 @@ def organize_files(directory):
             if any(filename.lower().endswith(ext) for ext in extentions):
                 # print(f"Matched '{filename}' as '{category}'")
                 # Determine the file's year for correct placement
-                year_subfolder = get_year_subfolder(file_path)
+                year_subfolder = get_year_month_subfolder(file_path)
                 # Define the subfolder path within the correct category
                 destination_folder = os.path.join(directory, category, year_subfolder)
                 # Ensure category and year subfolder exist
@@ -94,7 +97,7 @@ def organize_files(directory):
             
         # Place unrecognized files inside of "Others/YYYY"
         if not file_moved:
-            year_subfolder = get_year_subfolder(file_path)
+            year_subfolder = get_year_month_subfolder(file_path)
             destination_folder = os.path.join(directory, "Others", year_subfolder)
             
             os.makedirs(destination_folder, exist_ok=True)
