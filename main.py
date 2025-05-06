@@ -2,7 +2,7 @@ import os
 import shutil
 import datetime
 
-# Dictionary defining file categories and thier associated extensions
+# Dictionary defining file categories and their associated extensions
 
 FILE_CATEGORIES = {
     "Documents": [".pdf", ".doc", ".docx", ".txt"],
@@ -11,11 +11,11 @@ FILE_CATEGORIES = {
     "Videos": [".mp4", ".mov", ".avi"],
     "Archives": [".zip", ".rar", ".7z", ".tar"],
     "Data": [".csv", ".json", ".xml"],
-    # Unreognized files will go here
+    # Unrecognized files will go here
     "Others": []
 }
 
-# Defines how may years of files should be organized (past 5 years)
+# Defines how many years of files should be organized (past 5 years)
 YEAR_RANGE = 5
 
 def get_year_month_subfolder(file_path):
@@ -60,7 +60,7 @@ def organize_files(directory):
     if not os.path.isdir(directory):
         raise Exception(f"Error: {directory} is not a valid directory")
 
-    create_main_category_folders(directory)
+    # create_main_category_folders(directory)
         
     # Process files in the directory
     
@@ -97,20 +97,50 @@ def organize_files(directory):
             
         # Place unrecognized files inside of "Others/YYYY"
         if not file_moved:
-            year_subfolder = get_year_month_subfolder(file_path)
-            destination_folder = os.path.join(directory, "Others", year_subfolder)
-            
-            os.makedirs(destination_folder, exist_ok=True)
-            
-            destination = os.path.join(destination_folder, filename)
-            
-            # Only move files, skip directories
-            if not os.path.isdir(file_path):
-                shutil.move(file_path, destination)
-                print(f"Moved '{filename}' to '{destination}'")
-            else:
-                print(f"Skipping move for existing directory: {file_path}")
+            handle_unrecognized_files(file_path, directory)
+                
+                
+# def move_unrecognized_files(file_path, category, directory):
+#     """
+#     Moves files we might not normally encounter into the "Others/YYYY-Month" folder.
+#     """
+    
+#     year_month_subfolder = get_year_month_subfolder(file_path)
+    
+#     if year_month_subfolder == "Unknown":
+#         print(f"Skipping file with unknown modification date: {file_path}")
+#         return
+    
+#     destination_folder = os.path.join(directory, category, year_month_subfolder)
+#     os.makedirs(destination_folder, exist_ok=True)
 
+#     destination = os.path.join(destination_folder, os.path.basename(file_path))
+    
+#     shutil.move(file_path, destination)
+#     print(f"Moved '{file_path}' to '{destination}'")
+    
+
+def handle_unrecognized_files(file_path, directory):
+    """
+    Moves files we might not normally encounter into the "Others/YYYY-Month" folder.
+    """
+    if os.path.isdir(file_path):
+        print(f"Skipping move for existing directory: {file_path}")
+        return
+    
+    year_month_subfolder = get_year_month_subfolder(file_path)
+    
+    if year_month_subfolder == "Unknown":
+        print(f"Skipping unrecognized file with invalid date: {file_path}")
+        return
+    
+    destination_folder = os.path.join(directory, "Others", year_month_subfolder)
+    os.makedirs(destination_folder, exist_ok=True)
+
+    destination = os.path.join(destination_folder, os.path.basename(file_path))
+    
+    shutil.move(file_path, destination)
+    print(f"Moved '{file_path}' to '{destination}'")
 
 def main():
     """
