@@ -3,7 +3,6 @@ import shutil
 import datetime
 
 # Dictionary defining file categories and their associated extensions
-
 FILE_CATEGORIES = {
     "Documents": [".pdf", ".doc", ".docx", ".txt"],
     "Pictures": [".jpg", ".jpeg", ".png", ".gif"],
@@ -17,6 +16,9 @@ FILE_CATEGORIES = {
 
 # Defines how many years of files should be organized (past 5 years)
 YEAR_RANGE = 5
+
+# Define log filename for review
+LOG_FILE = "unexpected_dates.log"
 
 def get_year_month_subfolder(file_path):
     """
@@ -38,6 +40,9 @@ def get_year_month_subfolder(file_path):
             
             return f"{modified_date.year}-{month_name}"
         else:
+            # Log unexpected dates instead of silently ignoring them
+            with open(LOG_FILE, "a") as log:
+                log.write(f"{modified_date.year}-{modified_date.strftime('%m')}: {file_path}\n")
             # Ignore unexpected dates
             return "Unknown"
         
