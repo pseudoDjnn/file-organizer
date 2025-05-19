@@ -1,6 +1,10 @@
 import os
 import shutil
 import datetime
+import logging
+
+# Get a module-specific logger
+logger = logging.getLogger(__name__)
 
 # Dictionary defining file categories and their associated extensions
 FILE_CATEGORIES = {
@@ -65,13 +69,12 @@ def get_year_month_subfolder(file_path):
             return f"{modified_date.year}-{month_name}"
         else:
             # Log unexpected dates instead of silently ignoring them
-            with open(LOG_FILE, "a") as log:
-                log.write(f"{modified_date.year}-{modified_date.strftime('%m')}: {file_path}\n")
+            logger.info(f"Unexpected date: {modified_date.year}-{modified_date.strftime('%m')} for {file_path}")
             # Ignore unexpected dates
             return "Unknown"
         
     except Exception as e:
-        print(f"Error extracting year for {file_path}: {e}")
+        logger.error(f"Error extracting year for {file_path}: {e}")
         return "Unknown"
     
 def create_main_category_folders(directory):
@@ -87,6 +90,7 @@ def organize_files(directory):
     Raises an error if the path provided is invalid or inaccessible.
     """
     if not os.path.isdir(directory):
+        logger.error("Invalid directory: %s", directory)
         raise Exception(f"Error: {directory} is not a valid directory")
 
     # create_main_category_folders(directory)
@@ -96,12 +100,13 @@ def organize_files(directory):
     for filename in os.listdir(directory):
         # Skip sys default items if needed
         if filename in EXCLUDED_ITEMS:
-            print(f"Skipping excluded item: {filename}")
+            logger.info(f"Skipping excluded item: {filename}")
             continue
         
         # Skip excluded file extentions
         if any(filename.lower().endswith(ext) for ext in EXCLUDED_EXT):
-            print(f"Skipping file with excluded extension: {filename}")
+            logger.info(f"Skipping file with excluded extension: {filename}")
+            continue
         file_path = os.path.join(directory, filename)
         
         # Skip existing directories that are not in FILE_CATEGORIES (prevents re-moving)
@@ -122,11 +127,15 @@ def organize_files(directory):
                 destination_folder = os.path.join(directory, category, year_subfolder)
                 # Ensure category and year subfolder exist
                 os.makedirs(destination_folder, exist_ok=True)
-                print(f"Created/Verified Folder: {destination_folder}")
+                logger.info(f"Created/Verified Folder: {destination_folder}")
                 
                 # Move file into its category/year folder
                 destination = os.path.join(destination_folder, filename)
-                shutil.move(file_path, destination)
+                try:
+                    shutil.move(file_path, destination)
+                    logger.info("moved '%s' to '%s'", filename, destination)
+                except Exception as e:
+                    logger.error("Failed to move %s to %s: %s", file_path, destination, e)
                 # Mark as moved
                 file_moved = True
                 # Stop searching once a match is found
@@ -142,13 +151,13 @@ def handle_unrecognized_files(file_path, directory):
     Moves files we might not normally encounter into the "Others/YYYY-Month" folder.
     """
     if os.path.isdir(file_path):
-        print(f"Skipping move for existing directory: {file_path}")
+        logger.info(f"Skipping move for existing directory: {file_path}")
         return
     
     year_month_subfolder = get_year_month_subfolder(file_path)
     
     if year_month_subfolder == "Unknown":
-        print(f"Skipping unrecognized file with invalid date: {file_path}")
+        logger.info(f"Skipping unrecognized file with invalid date: {file_path}")
         return
     
     destination_folder = os.path.join(directory, "Others", year_month_subfolder)
@@ -156,5 +165,8 @@ def handle_unrecognized_files(file_path, directory):
 
     destination = os.path.join(destination_folder, os.path.basename(file_path))
     
-    shutil.move(file_path, destination)
-    print(f"Moved '{file_path}' to '{destination}'")
+    try:
+        shutil.move(file_path, destination)
+        logger.info(f"Moved '{file_path}' to '{destination}'")
+    except Exception as e:
+        logger.error("Failed to move %s to %s: %s", file_path, destination, e)
