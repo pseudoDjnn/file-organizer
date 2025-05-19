@@ -1,12 +1,6 @@
 import logging
 from file_organizer import organize_files
 
-logging.basicConfig(
-    filename="app.log",
-    
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
 
 def main():
     """
