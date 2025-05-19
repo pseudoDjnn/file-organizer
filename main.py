@@ -88,6 +88,9 @@ def organize_files(directory):
     # Process files in the directory
     
     for filename in os.listdir(directory):
+        if filename in EXCLUDED_ITEMS:
+            print("Skipping excluded item: {filename}")
+            continue
         file_path = os.path.join(directory, filename)
         
         # Skip existing directories that are not in FILE_CATEGORIES (prevents re-moving)
