@@ -15,6 +15,7 @@ FILE_CATEGORIES = {
     "Others": []
 }
 
+# Made to not tamper with a Windows Desktop
 EXCLUDED_ITEMS = {
 
     # Common Windows system file
@@ -30,6 +31,11 @@ EXCLUDED_ITEMS = {
     
     # Legacy config
     "Control Panel"
+}
+
+# File extensions we are not wanting to include
+EXCLUDED_EXT = {
+    ".exe"
 }
 
 # Defines how many years of files should be organized (past 5 years)
@@ -88,9 +94,14 @@ def organize_files(directory):
     # Process files in the directory
     
     for filename in os.listdir(directory):
+        # Skip sys default items if needed
         if filename in EXCLUDED_ITEMS:
-            print("Skipping excluded item: {filename}")
+            print(f"Skipping excluded item: {filename}")
             continue
+        
+        # Skip excluded file extentions
+        if any(filename.lower().endswith(ext) for ext in EXCLUDED_EXT):
+            print(f"Skipping file with excluded extension: {filename}")
         file_path = os.path.join(directory, filename)
         
         # Skip existing directories that are not in FILE_CATEGORIES (prevents re-moving)
