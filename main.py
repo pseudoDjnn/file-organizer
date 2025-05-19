@@ -10,8 +10,26 @@ FILE_CATEGORIES = {
     "Videos": [".mp4", ".mov", ".avi"],
     "Archives": [".zip", ".rar", ".7z", ".tar"],
     "Data": [".csv", ".json", ".xml"],
+
     # Unrecognized files will go here
     "Others": []
+}
+
+EXCLUDED_ITEMS = {
+
+    # Common Windows system file
+    "deskstop.ini",
+    
+    # Virtual folder (if it appears)
+    "This PC",
+    "Recycle Bin",
+    "Network",
+    
+    # Default OneDrive shortcut
+    "OneDrive",
+    
+    # Legacy config
+    "Control Panel"
 }
 
 # Defines how many years of files should be organized (past 5 years)
