@@ -133,7 +133,8 @@ def organize_files(directory):
                 destination = os.path.join(destination_folder, filename)
                 try:
                     shutil.move(file_path, destination)
-                    logger.info("moved '%s' to '%s'", filename, destination)
+                    logger.info("Moved '%s' to '%s'", filename, destination)
+                    print(f"Task Completed: '{filename}' has been moved to '{destination}'")
                 except Exception as e:
                     logger.error("Failed to move %s to %s: %s", file_path, destination, e)
                 # Mark as moved
