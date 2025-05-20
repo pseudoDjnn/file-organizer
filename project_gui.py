@@ -45,10 +45,21 @@ class GuiForProject(QMainWindow):
         self.apply_styles()
         
     def browse_directory(self):
-        pass
+        directory = QFileDialog.getExistingDirectory(self, "Select Directory")
+        if directory:
+            self.selected_directory = directory
+            self.status_label.setText(f"Selected: {directory}")
+            logger.info("User selected directory: %s", directory)
     
     def run_organizer(self):
         pass
 
     def apply_styles(self):
         pass
+    
+    
+if __name__=='__main__':
+    app = QApplication(sys.argv)
+    window = GuiForProject()
+    window.show()
+    sys.exit(app.exec())
