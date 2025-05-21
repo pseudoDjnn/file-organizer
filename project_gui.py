@@ -10,20 +10,44 @@ def run_gui():
 
     # Set the window title
     
-    root.title("Simple Tkinter Window")
+    root.title("File Organizer")
     
-    # Set the window dimensions: width x height
+    # Set the window dimensions: Center
     
-    root.geometry("400x300")
+    window_width = 500
+    window_height = 150
+    
+    # Get Screen dimensions
+    
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    
+    
+    # Calc to find center position
+    
+    x_position = (screen_width - window_width) // 2
+    y_position = (screen_height - window_height) // 4
+    
+    root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
+
+    # Create a main frame for better structure
+    
+    main_frame = tk.Frame(root, padx=10, pady=10)
+    main_frame.pack(fill='both', expand=True)
+    
+    # Create a frame for file selection
+    
+    file_frame = tk.Frame(main_frame)
+    file_frame.grid(row=0, column=0, sticky="w")
+    file_frame.columnconfigure(0, weight=1)
     
     # Label to display the selected directory
-    
-    default_directory = "/mnt/c/Users/lavah/"
+    # default_directory = "/mnt/c/Users/lavah/"
     
     selected_directory = None
     
-    directory_label = tk.Label(root, text="Please Select a directory", padx=10, pady=10)
-    directory_label.pack()
+    directory_label = tk.Label(file_frame, text="Please Select a directory", anchor="w")
+    directory_label.grid(row=0, column=1, columnspan=2, padx=5, pady=5, sticky="w")
     
     # Function to open a directory chooser dialog
     
@@ -34,7 +58,6 @@ def run_gui():
         directory = filedialog.askdirectory(
             title="Select Your Directory to Organize",
             # Commented out for the sake of other OS as of right now
-            
             # initialdir=default_directory
             )
         if directory:
@@ -43,8 +66,8 @@ def run_gui():
             
     # Button to browse for a directory
     
-    browse_button = tk.Button(root, text="Browse Directory", command=select_directory, padx=5, pady=5)
-    browse_button.pack()
+    browse_button = tk.Button(file_frame, text="Browse Directory", command=select_directory)
+    browse_button.grid(row=1, column=0, padx=5, pady=5)
     
     # Function to run the organizer with the selected directory
     
@@ -58,8 +81,8 @@ def run_gui():
         else:
             directory_label.config(text=f"Please select a directory first!")
 
-    browse_button = tk.Button(root, text="Run Organizer", command=run_organizer_command, padx=5, pady=5)
-    browse_button.pack()
+    browse_button = tk.Button(file_frame, text="Run Organizer", command=run_organizer_command, padx=5, pady=5)
+    browse_button.grid(row=1, column=3, padx=5,pady=5)
     
     # Start the event loop
     
