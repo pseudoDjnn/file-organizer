@@ -1,6 +1,6 @@
 import logging
 from file_organizer import organize_files
-from project_gui import run_gui
+from project_gui import OrganizerGUI
 
 # Get our logger form config
 logger = logging.getLogger(__name__)
@@ -22,4 +22,5 @@ def main():
         print(f"An error occured: {e}")
     
 if __name__ == "__main__": 
-    run_gui()
+    gui = OrganizerGUI()
+    gui.run()
