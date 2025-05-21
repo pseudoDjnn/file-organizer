@@ -20,7 +20,7 @@ def run_gui():
     
     default_directory = "/mnt/c/Users/lavah/"
     
-    selected_directory = default_directory
+    selected_directory = None
     
     directory_label = tk.Label(root, text="Please Select a directory", padx=10, pady=10)
     directory_label.pack()
