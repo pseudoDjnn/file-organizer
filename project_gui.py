@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 
 from file_organizer import organize_files
+from filepath_utils import FilePathUtils
 
 class OrganizerGUI:
     def __init__(self):
@@ -38,6 +39,10 @@ class OrganizerGUI:
     # default_directory = "/mnt/c/Users/lavah/"
     
         self.selected_directory = None
+        
+    # Init for shortener
+    
+        self.path_utils = FilePathUtils(max_length=34)
         
     # Build the GUI
     
@@ -102,7 +107,11 @@ class OrganizerGUI:
             )
         if directory:
             self.selected_directory = directory
-            self.directory_label.config(text=f"Selected: {directory}")
+            
+            # Adding the shortener
+            
+            shortener = self.path_utils.shortener(directory)
+            self.directory_label.config(text="Selected: " + shortener)
             
     # Button to browse for a directory
     
