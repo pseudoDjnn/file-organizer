@@ -28,8 +28,10 @@ class FileOrganizer:
         
     def get_year_month_subfolder(self, file_path):
         """
+        
         Determines the last modified year of the file.
         Ensures the year falls within a valid range before categorization.
+
         """
         try:
             # Get modification time
@@ -61,33 +63,35 @@ class FileOrganizer:
         for category in self.file_categories:
             folder_path = os.path.join(self.directory, category)
             os.makedirs(folder_path, exist_ok=True)
-            logger.info("Ensure category fodler exists: %s", folder_path)
+            logger.info(f"Ensure category folder exists: {folder_path}")
         
     def organize_files(self):
+
         """
         Organizes files in the given dir based on their file type and subfolders based on date.
         Raises an error if the path provided is invalid or inaccessible.
+        
         """
         
-
-        # create_main_category_folders(directory)
+        # Proactive call 
+        # self.create_main_category_folders(directory)
             
         # Process files in the directory
         
         for filename in os.listdir(self.directory):
             # Skip sys default items if needed
-            if filename in EXCLUDED_ITEMS:
+            if filename in self.excluded_items:
                 logger.info(f"Skipping excluded item: {filename}")
                 continue
             
             # Skip excluded file extentions
-            if any(filename.lower().endswith(ext) for ext in EXCLUDED_EXT):
+            if any(filename.lower().endswith(ext) for ext in self.excluded_ext):
                 logger.info(f"Skipping file with excluded extension: {filename}")
                 continue
             file_path = os.path.join(self.directory, filename)
             
             # Skip existing directories that are not in FILE_CATEGORIES (prevents re-moving)
-            if os.path.isdir(file_path) and filename not in self.file_categories.keys():
+            if os.path.isdir(file_path) and filename not in self.file_categories:
                 # Skips unrelated folders
                 continue
 
@@ -110,10 +114,10 @@ class FileOrganizer:
                     destination = os.path.join(destination_folder, filename)
                     try:
                         shutil.move(file_path, destination)
-                        logger.info("Moved '%s' to '%s'", filename, destination)
+                        logger.info(f"Moved {filename} to {destination}")
                         print(f"Task Completed: '{filename}' has been moved to '{destination}'")
                     except Exception as e:
-                        logger.error("Failed to move %s to %s: %s", file_path, destination, e)
+                        logger.error(f"Failed to move {file_path} to {destination}: {e}")
                     # Mark as moved
                     file_moved = True
                     # Stop searching once a match is found
@@ -126,8 +130,11 @@ class FileOrganizer:
 
     def handle_unrecognized_files(self, file_path):
         """
+        
         Moves files we might not normally encounter into the "Others/YYYY-Month" folder.
+
         """
+
         if os.path.isdir(file_path):
             logger.info(f"Skipping move for existing directory: {file_path}")
             return

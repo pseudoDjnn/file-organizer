@@ -1,5 +1,5 @@
 import logging
-from file_organizer import organize_files
+from file_organizer import FileOrganizer
 from project_gui import OrganizerGUI
 
 # Get our logger form config
@@ -15,7 +15,8 @@ def main():
     
     directory_to_organize = input("Enter the directory path to organize: ")
     try:
-        organize_files(directory_to_organize)
+        organizer = FileOrganizer(directory_to_organize)
+        organizer.organize_files()
         logger.info(f"Files organized in directory: {directory_to_organize}")
     except Exception as e:
         logger.error(f"An error occurred during the organization: {e}")

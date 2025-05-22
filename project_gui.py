@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 
-from file_organizer import organize_files
+from file_organizer import FileOrganizer
 from filepath_utils import FilePathUtils
 
 class OrganizerGUI:
@@ -125,7 +125,8 @@ class OrganizerGUI:
     def run_organizer_command(self):
         if self.selected_directory:
             try:
-                organize_files(self.selected_directory)
+                organizer = FileOrganizer(self.selected_directory)
+                organizer.organize_files()
                 self.directory_label.config(text=f"Organizer complete for:\n {self.selected_directory}")
             except Exception as e:
                 self.directory_label.config(text=f"Error:\n {e}")
