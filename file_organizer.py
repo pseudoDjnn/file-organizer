@@ -3,51 +3,10 @@ import shutil
 import datetime
 import logging
 
+from config import FILE_CATEGORIES, EXCLUDED_ITEMS, EXCLUDED_EXT, YEAR_RANGE
+
 # Get a module-specific logger
 logger = logging.getLogger(__name__)
-
-# Dictionary defining file categories and their associated extensions
-FILE_CATEGORIES = {
-    "Documents": [".pdf", ".doc", ".docx", ".txt"],
-    "Pictures": [".jpg", ".jpeg", ".png", ".gif"],
-    "Audio": [".mp3", ".wav", ".flac"],
-    "Videos": [".mp4", ".mov", ".avi"],
-    "Archives": [".zip", ".rar", ".7z", ".tar"],
-    "Data": [".csv", ".json", ".xml"],
-
-    # Unrecognized files will go here
-    "Others": []
-}
-
-# Made to not tamper with a Windows Desktop
-EXCLUDED_ITEMS = {
-
-    # Common Windows system file
-    "desktop.ini",
-    
-    # Virtual folder (if it appears)
-    "This PC",
-    "Recycle Bin",
-    "Network",
-    
-    # Default OneDrive shortcut
-    "OneDrive",
-    
-    # Legacy config
-    "Control Panel"
-}
-
-# File extensions we are not wanting to include
-EXCLUDED_EXT = {
-    ".exe"
-}
-
-# Defines how many years of files should be organized (past 5 years)
-YEAR_RANGE = 5
-
-# Define log filename for review
-# LOG_FILE = "unexpected_dates.log"
-
 
 class FileOrganizer:
     def __init__(self,
@@ -96,7 +55,7 @@ class FileOrganizer:
             logger.error(f"Error extracting year for {file_path}: {e}")
             return "Unknown"
         
-    def create_main_category_folders(self, directory):
+    def create_main_category_folders(self):
         # Create category directories if they don't exist before organizing
         
         for category in self.file_categories:
@@ -104,7 +63,7 @@ class FileOrganizer:
             os.makedirs(folder_path, exist_ok=True)
             logger.info("Ensure category fodler exists: %s", folder_path)
         
-    def organize_files(self, directory):
+    def organize_files(self):
         """
         Organizes files in the given dir based on their file type and subfolders based on date.
         Raises an error if the path provided is invalid or inaccessible.
@@ -162,10 +121,10 @@ class FileOrganizer:
                 
             # Place unrecognized files inside of "Others/YYYY"
             if not file_moved:
-                self.handle_unrecognized_files(file_path, directory)
+                self.handle_unrecognized_files(file_path)
         
 
-    def handle_unrecognized_files(self, file_path, directory):
+    def handle_unrecognized_files(self, file_path):
         """
         Moves files we might not normally encounter into the "Others/YYYY-Month" folder.
         """
@@ -179,7 +138,7 @@ class FileOrganizer:
             logger.info(f"Skipping unrecognized file with invalid date: {file_path}")
             return
         
-        destination_folder = os.path.join(directory, "Others", year_month_subfolder)
+        destination_folder = os.path.join(self.directory, "Others", year_month_subfolder)
         os.makedirs(destination_folder, exist_ok=True)
 
         destination = os.path.join(destination_folder, os.path.basename(file_path))
@@ -188,4 +147,4 @@ class FileOrganizer:
             shutil.move(file_path, destination)
             logger.info(f"Moved '{file_path}' to '{destination}'")
         except Exception as e:
-            logger.error("Failed to move %s to %s: %s", file_path, destination, e)
+            logger.error(f"Failed to move {file_path} to {destination}: {e}")
