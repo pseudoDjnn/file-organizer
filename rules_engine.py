@@ -92,3 +92,21 @@ class ExtensionRule(Rule):
         file_path = file_info.get('path')
         if not file_path:
             return
+        
+        # Ensure our folder exists and create one if it doesn't; True so we don't raise an exception
+        
+        os.makedirs(self.destination_folder, exist_ok=True)
+        
+        # Create full destination by joining destination_folder and file_path
+        
+        destination = os.path.join(self.destination_folder, os.path.basename(file_path))
+        
+        #  Attempt to move using shutil.move
+        
+        try:
+            shutil.move(file_path, destination)
+            print(f"Rule '{self.name}' move '{file_info.get('name')}' to {destination}")
+        except Exception as e:
+            print(f"Rule '{self.name}' failed to move '{file_info.get('name')}', Error: {e}")
+            
+        
