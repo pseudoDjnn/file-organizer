@@ -21,7 +21,9 @@ class Rule:
         
         Parameter:
             file_info:  dict with the file metadata (e.g., 'name', 'path')
-            return: True is theis rule applies and False is not
+
+        Return:
+            'True' if the rule applies and False is not
         
         """
         
@@ -54,12 +56,26 @@ class ExtensionRule(Rule):
         """
         super().__init__(self, description, enabled)
         # Call new parms
-        self.target_extension = target_extension
+        self.target_extension = target_extension.lower()
         self.destination_folder = destination_folder
         
         
-    def applies_to(self):
-        pass
+    def applies_to(self, file_info):
+        """
+        
+        Identify name of the file using a dict.
+        Make sure we lower the name of the file and it ends with our target_extension (that is also lowered up above)
+        
+        Parameters:
+            file_info: dict that will allow out file name, if any, to match our extension
+        Return: 
+            'True' if file_name ends with our target_extension
+        
+        """
+
+        file_name = file_info.get('name', '').lower()
+        
+        return file_name.endswith(self.target_extension)
     
     def apply(self):
         pass
