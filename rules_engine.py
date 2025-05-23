@@ -23,6 +23,8 @@ class Rule:
             return: True is theis rule applies and False is not
         
         """
+        
+        raise NotImplementedError("This method must be overridden by subclasses.")
     
     def apply(self, file_path):
         """
@@ -33,3 +35,5 @@ class Rule:
             file_path:  dict with file metadata.
         
         """
+        
+        raise NotImplementedError("This method must be overridden bu subclasses.")
