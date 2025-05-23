@@ -1,4 +1,5 @@
-
+import os
+import shutil
 
 class Rule:
     def __init__(self, name, description, enabled=True):
@@ -37,3 +38,13 @@ class Rule:
         """
         
         raise NotImplementedError("This method must be overridden bu subclasses.")
+    
+    
+class ExtensionRule(Rule):
+    def __init__(self, name, description):
+        """
+        
+        Init an extension-based rule.
+        
+        """
+        pass
