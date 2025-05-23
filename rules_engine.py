@@ -110,3 +110,7 @@ class ExtensionRule(Rule):
             print(f"Rule '{self.name}' failed to move '{file_info.get('name')}', Error: {e}")
             
         
+        
+class RulesEngine:
+    def __init__(self):
+        pass
