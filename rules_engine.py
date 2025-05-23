@@ -12,8 +12,24 @@ class Rule:
         self.description = description
         self.enabled = enabled
         
-    def applies_to(self):
-        pass
+    def applies_to(self, file_info):
+        """
+        
+        Make a determination whether the reule applies to the given file.
+        Return 'True' if the rule should act on the file.
+        
+        Parameter:
+            file_info:  dict with the file metadata (e.g., 'name', 'path')
+            return: True is theis rule applies and False is not
+        
+        """
     
-    def apply(self):
-        pass
+    def apply(self, file_path):
+        """
+        
+        Carry out the action of the rule method above on the file.
+        
+        Parameter:
+            file_path:  dict with file metadata.
+        
+        """
