@@ -41,10 +41,25 @@ class Rule:
     
     
 class ExtensionRule(Rule):
-    def __init__(self, name, description):
+    def __init__(self, name, description, target_extension, destination_folder, enabled=True):
         """
         
         Init an extension-based rule.
         
+        Parameter:
+            target_extension: e.g., '.jpeg'
+        Parameter:
+            destination_folder: path where matching files should move
+        
         """
+        super().__init__(self, description, enabled)
+        # Call new parms
+        self.target_extension = target_extension
+        self.destination_folder = destination_folder
+        
+        
+    def applies_to(self):
+        pass
+    
+    def apply(self):
         pass
