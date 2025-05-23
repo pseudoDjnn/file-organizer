@@ -77,5 +77,18 @@ class ExtensionRule(Rule):
         
         return file_name.endswith(self.target_extension)
     
-    def apply(self):
-        pass
+    def apply(self, file_info):
+        """
+        
+        Move the file to the designated folder.
+        
+        Parameters:
+            file_info: Out dict with the metadata
+        
+        """
+        
+        # Fetch the abs path of the file
+        
+        file_path = file_info.get('path')
+        if not file_path:
+            return
