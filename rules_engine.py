@@ -178,3 +178,22 @@ class FallBack(Rule):
         """
         super().__init__(name, description, enabled)
         self.base_destination = base_destination
+        
+    def applies_to(self, file_info):
+        """
+        
+        Determine if a fallback should happen to a give file.
+        
+        Parameters:
+            file_info: dict with our metadata
+            
+        Returns:
+            True is we have a file that matches, False otherwise
+        
+        """
+        
+        file_path = file_info.get('path')
+        return file_path is not None and os.path.exists(file_path)
+    
+    def apply(self, file_info):
+        pass
