@@ -1,5 +1,6 @@
 import os
 import shutil
+import datetime
 
 class Rule:
     def __init__(self, name, description, enabled=True):
@@ -196,4 +197,36 @@ class FallBack(Rule):
         return file_path is not None and os.path.exists(file_path)
     
     def apply(self, file_info):
-        pass
+        """
+        
+        Move the file to the fallback folder (Others folder)
+         
+        Steps:
+           1. Retrieve the file's modification time
+           2. Build a destination (Others) folder using datetime
+           3. Ensure our destination folder exists and mkae one if it doesn't
+           4. Move our files to the 'Others' destination folder using shutil
+            
+        Parameters:
+            file_info: dict using metadata
+        
+        """
+        
+        file_path = file_info.get('path')
+        if not file_path or not os.path.exists(file_path):
+            return
+        
+        # Compute the year-month from the file's last modification time
+        
+        try:
+            last_epoch_time = os.path.getmtime(file_path)
+            modified_date = datetime.datetime.fromtimestamp(last_epoch_time)
+            month_and_year = f"{modified_date.year}-{modified_date.strftime('%B')}"
+        except Exception as e:
+            print(f"Fallback Rule error: Unable to retrieve modification time for '{file_info.get('name')}'. Error: '{e}'")
+            return
+        
+        # Specify destination
+        
+        destination_folder = os.path.join(self.base_destination, "Others", month_and_year)
+        os.makedirs(destination_folder, exist_ok=True)
