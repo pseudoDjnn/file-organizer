@@ -113,4 +113,54 @@ class ExtensionRule(Rule):
         
 class RulesEngine:
     def __init__(self):
-        pass
+        """
+        
+        Init the RulesEngine with an empty list
+        
+        """
+        
+        self.rules = []
+        
+    def add_rule(self, rule):
+        """
+        
+        Add a rule to the engines list of rules.
+        
+        Parameter:
+            rule: Init a class derived from Rule
+        
+        """
+        
+        self.rules.append(rule)
+    
+    def process_files(self, file_list):
+        """
+        
+        Process each file in file_list.
+        Check each file; check each rule.
+        If a rule's condition (applies_to) returns True, then the rule's action (apply) is executed.
+
+        Parameters:
+            file_list:  A list of dicts, each contain the metadata.
+                        Example: [{'name'}: 'photo.jpg', 'path': '/images/photo.jpg']
+        
+        """
+        # Iterate over each file_list
+        
+        for file_info in file_list:
+            
+            # Iterate over each rule of the file
+            
+            for rule in self.rules:
+                
+                # Only when rules are active
+                
+                if rule.enabled:
+                    
+                    # Check if rule applies to the file and then call our method when we have a match
+                    
+                    if rule.applies_to(file_info):
+                        
+                        # Execute the action on the file when all criteria has been met
+                        
+                        rule.apply(file_info)
