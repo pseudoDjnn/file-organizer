@@ -164,3 +164,17 @@ class RulesEngine:
                         # Execute the action on the file when all criteria has been met
                         
                         rule.apply(file_info)
+                        
+                        
+class FallBack(Rule):
+    def __init__(self, name, description, base_destination, enabled=True):
+        """
+        
+        Init fallback for files we do not look for (Others folder).
+        
+        Parameters:
+            base_destination: Base folder for our fallback destination
+        
+        """
+        super().__init__(name, description, enabled)
+        self.base_destination = base_destination
