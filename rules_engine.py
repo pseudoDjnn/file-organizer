@@ -229,7 +229,7 @@ class FallbackRule(Rule):
         
         try:
             modified_time = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
-            month_and_year = modified_time.strftime("%Y-%B")
+            month_and_year = modified_time.strftime("%B %Y")
         except Exception as e:
             print(f"[ERROR] FallbackRule: Unable to retrieve modification time for '{file_info.get('name')}'. Error: {e}")
             return

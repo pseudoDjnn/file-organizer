@@ -35,23 +35,33 @@ class FileOrganizer:
 
         """
         try:
+            
             # Get modification time
+
             modified_timestamp = os.path.getmtime(file_path)
 
             # Convert to date
+
             modified_date = datetime.datetime.fromtimestamp(modified_timestamp)
             current_year = datetime.datetime.now().year
             
             # Ensure the file year falls within the valid YEAR_RANGE
+
             if (current_year - modified_date.year) <= self.year_range:
+
                 # Convert month number to name
+
                 month_name = modified_date.strftime("%B")
                 
                 return f"{modified_date.year}-{month_name}"
             else:
+
                 # Log unexpected dates instead of silently ignoring them
+
                 logger.info(f"Unexpected date: {modified_date.year}-{modified_date.strftime('%m')} for {file_path}")
+
                 # Ignore unexpected dates
+                
                 return "Unknown"
             
         except Exception as e:
@@ -127,33 +137,15 @@ class FileOrganizer:
             engine.add_rule(rule)
         
         # Add the fallback rule for any file not handled by the above rules
-
         
-
-    def handle_unrecognized_files(self, file_path):
-        """
+        fallback_rule = FallbackRule(
+            name="Fallback Rule",
+            description="Handles unrecognized files by moving them to the 'Other' folder",
+            base_destination=self.directory,
+            enabled=True
+        )
+        engine.add_rule(fallback_rule)
         
-        Moves files we might not normally encounter into the "Others/YYYY-Month" folder.
-
-        """
-
-        if os.path.isdir(file_path):
-            logger.info(f"Skipping move for existing directory: {file_path}")
-            return
+        # Process all the file form the file_list using the rules engine.
         
-        year_month_subfolder = self.get_year_month_subfolder(file_path)
-        
-        if year_month_subfolder == "Unknown":
-            logger.info(f"Skipping unrecognized file with invalid date: {file_path}")
-            return
-        
-        destination_folder = os.path.join(self.directory, "Others", year_month_subfolder)
-        os.makedirs(destination_folder, exist_ok=True)
-
-        destination = os.path.join(destination_folder, os.path.basename(file_path))
-        
-        try:
-            shutil.move(file_path, destination)
-            logger.info(f"Moved '{file_path}' to '{destination}'")
-        except Exception as e:
-            logger.error(f"Failed to move {file_path} to {destination}: {e}")
+        engine.process_files(file_list)
