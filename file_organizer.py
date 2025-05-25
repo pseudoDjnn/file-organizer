@@ -4,6 +4,7 @@ import datetime
 import logging
 
 from config import FILE_CATEGORIES, EXCLUDED_ITEMS, EXCLUDED_EXT, YEAR_RANGE
+from rules_engine import RulesEngine, ExtensionRule, FallbackRule
 
 # Get a module-specific logger
 logger = logging.getLogger(__name__)
@@ -78,54 +79,55 @@ class FileOrganizer:
             
         # Process files in the directory
         
+        file_list = []
+        
         for filename in os.listdir(self.directory):
+
             # Skip sys default items if needed
+
             if filename in self.excluded_items:
                 logger.info(f"Skipping excluded item: {filename}")
                 continue
             
             # Skip excluded file extentions
+
             if any(filename.lower().endswith(ext) for ext in self.excluded_ext):
                 logger.info(f"Skipping file with excluded extension: {filename}")
                 continue
             file_path = os.path.join(self.directory, filename)
             
-            # Skip existing directories that are not in FILE_CATEGORIES (prevents re-moving)
-            if os.path.isdir(file_path) and filename not in self.file_categories:
-                # Skips unrelated folders
-                continue
+            # Optionally avoid processing and handling of directories
 
-            # Track whether a file has been moved
-            file_moved = False
-            
-            # Iterate through FILE_CATEGORIES to match file extensions
-            for category, extensions in self.file_categories.items():
-                if any(filename.lower().endswith(ext) for ext in extensions):
-                    # print(f"Matched '{filename}' as '{category}'")
-                    # Determine the file's year for correct placement
-                    year_subfolder = self.get_year_month_subfolder(file_path)
-                    # Define the subfolder path within the correct category
-                    destination_folder = os.path.join(self.directory, category, year_subfolder)
-                    # Ensure category and year subfolder exist
-                    os.makedirs(destination_folder, exist_ok=True)
-                    logger.info(f"Created/Verified Folder: {destination_folder}")
-                    
-                    # Move file into its category/year folder
-                    destination = os.path.join(destination_folder, filename)
-                    try:
-                        shutil.move(file_path, destination)
-                        logger.info(f"Moved {filename} to {destination}")
-                        print(f"Task Completed: '{filename}' has been moved to '{destination}'")
-                    except Exception as e:
-                        logger.error(f"Failed to move {file_path} to {destination}: {e}")
-                    # Mark as moved
-                    file_moved = True
-                    # Stop searching once a match is found
-                    break
+            if os.path.isfile(file_path):
+                file_list.append({'name': filename, 'path': file_path})
                 
-            # Place unrecognized files inside of "Others/YYYY"
-            if not file_moved:
-                self.handle_unrecognized_files(file_path)
+        # Init our Rule class
+                
+        engine = RulesEngine()
+        
+        # Loop configured categories (not 'Others' since that is fallback)
+        
+        for category, extensions in self.file_categories.items():
+            if category == "Others":
+                continue
+            
+            # Determine the destination folder for the category
+            
+            destination_folder = os.path.join(self.directory, category)
+            
+            # Create an Extension that accepts a list of extension for this category
+            
+            rule = ExtensionRule(
+                name=f"{category} Rule",
+                description=f"Moves files matching the {category} category",
+                target_extensions=extensions,
+                destination_folder=destination_folder,
+                enabled=True
+            )
+            engine.add_rule(rule)
+        
+        # Add the fallback rule for any file not handled by the above rules
+
         
 
     def handle_unrecognized_files(self, file_path):
