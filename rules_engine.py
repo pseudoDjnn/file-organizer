@@ -30,17 +30,17 @@ class Rule:
         
         raise NotImplementedError("This method must be overridden by subclasses.")
     
-    def apply(self, file_path):
+    def apply(self, file_info):
         """
         
         Carry out the action of the rule method above on the file.
         
         Parameter:
-            file_path:  dict with file metadata.
+            file_path: Dictionary containing file metadata ('name', 'path').
         
         """
         
-        raise NotImplementedError("This method must be overridden bu subclasses.")
+        raise NotImplementedError("This method must be overridden by subclasses.")
     
     
 class ExtensionRule(Rule):
@@ -55,7 +55,7 @@ class ExtensionRule(Rule):
             destination_folder: path where matching files should move
         
         """
-        super().__init__(self, description, enabled)
+        super().__init__(name, description, enabled)
         # Call new parms
         self.target_extension = target_extension.lower()
         self.destination_folder = destination_folder
@@ -156,18 +156,20 @@ class RulesEngine:
                 
                 # Only when rules are active
                 
-                if rule.enabled:
+                if not rule.enabled:
+                    print(f"[SKIPPED] Rule '{rule.name}' is disabled")
+                    continue
                     
                     # Check if rule applies to the file and then call our method when we have a match
                     
-                    if rule.applies_to(file_info):
+                if rule.applies_to(file_info):
                         
-                        # Execute the action on the file when all criteria has been met
+                    # Execute the action on the file when all criteria has been met
                         
-                        rule.apply(file_info)
+                    rule.apply(file_info)
                         
                         
-class FallBack(Rule):
+class FallbackRule(Rule):
     def __init__(self, name, description, base_destination, enabled=True):
         """
         
@@ -219,14 +221,25 @@ class FallBack(Rule):
         # Compute the year-month from the file's last modification time
         
         try:
-            last_epoch_time = os.path.getmtime(file_path)
-            modified_date = datetime.datetime.fromtimestamp(last_epoch_time)
-            month_and_year = f"{modified_date.year}-{modified_date.strftime('%B')}"
+            modified_time = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
+            month_and_year = modified_time.strftime("%Y-%B")
         except Exception as e:
-            print(f"Fallback Rule error: Unable to retrieve modification time for '{file_info.get('name')}'. Error: '{e}'")
+            print(f"[ERROR] FallbackRule: Unable to retrieve modification time for '{file_info.get('name')}'. Error: {e}")
             return
         
         # Specify destination
         
         destination_folder = os.path.join(self.base_destination, "Others", month_and_year)
         os.makedirs(destination_folder, exist_ok=True)
+        
+        # Full destination path with our folder name
+        
+        destination = os.path.join(destination_folder, os.path.basename(file_path))
+
+        # try/except to move the file
+        
+        try:
+            shutil.move(file_path, destination)
+            print(f"Fallback to Others folder '{file_info.get('name')}' to '{destination}'")
+        except Exception as e:
+            print(f"Fallback failed to move '{file_info.get('name')}'. Error: {e}")

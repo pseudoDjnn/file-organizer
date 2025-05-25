@@ -57,13 +57,13 @@ class FileOrganizer:
             logger.error(f"Error extracting year for {file_path}: {e}")
             return "Unknown"
         
-    def create_main_category_folders(self):
-        # Create category directories if they don't exist before organizing
+    # def create_main_category_folders(self):
+    #     # Create category directories if they don't exist before organizing
         
-        for category in self.file_categories:
-            folder_path = os.path.join(self.directory, category)
-            os.makedirs(folder_path, exist_ok=True)
-            logger.info(f"Ensure category folder exists: {folder_path}")
+    #     for category in self.file_categories:
+    #         folder_path = os.path.join(self.directory, category)
+    #         os.makedirs(folder_path, exist_ok=True)
+    #         logger.info(f"Ensure category folder exists: {folder_path}")
         
     def organize_files(self):
 
