@@ -160,7 +160,7 @@ class RulesEngine:
         
         self.rules.append(rule)
     
-    def process_files(self, file_list):
+    def process_files(self, file_list, report_data=None):
         """
         
         Process each file in file_list.
@@ -170,11 +170,16 @@ class RulesEngine:
         Parameters:
             file_list:  A list of dicts, each contain the metadata.
                         Example: [{'name'}: 'photo.jpg', 'path': '/images/photo.jpg']
+            report_data:  A list to report records that get appended
         
         """
         # Iterate over each file_list
         
         for file_info in file_list:
+            
+            # Grab the original path for creating a report
+            
+            original_path = file_info.get('path')
             
             # Iterate over each rule of the file
             
@@ -190,9 +195,19 @@ class RulesEngine:
                     
                 if rule.applies_to(file_info):
                         
-                    # Execute the action on the file when all criteria has been met
-                        
-                    if rule.apply(file_info):
+                    # Return a tuple: (success, destination)
+                    
+                    success, dest = rule.apply(file_info)
+                    if success:
+                        if report_data is not None:
+                            record = {
+                                "file_name": file_info.get('name'),
+                                "original_path": original_path,
+                                "destination": dest,
+                                "rule_applied": rule.name,
+                                "processed_at": datetime.datetime.now().isoformat()
+                                
+                            }
                         
                         # Move if a rule has been applied
                         
