@@ -1,6 +1,12 @@
 import os
 import shutil
 import datetime
+import logging
+
+from config import FILE_CATEGORIES, EXCLUDED_ITEMS, EXCLUDED_EXT, YEAR_RANGE
+
+logger = logging.getLogger(__name__)
+
 
 class Rule:
     def __init__(self, name, description, enabled=True):
@@ -99,23 +105,36 @@ class ExtensionRule(Rule):
         
         file_path = file_info.get('path')
         if not file_path:
-            return
+            return False
+        
+        # Make attempt for files epoch time modification
+        
+        try:
+            modified_time = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
+            month_and_year = modified_time.strftime("%B %Y")
+            logger.info(f"File '{file_info.get('name')}' modified on {modified_time} -> subfolder: {month_and_year}")
+        except Exception as e:
+            logger.error(f"ExtensionRule '{self.name}': Unable to retrieve modified time for '{file_info.get('name')}'.  Error: {e}")
+            return False
         
         # Ensure our folder exists and create one if it doesn't; True so we don't raise an exception
+        final_file_destination = os.path.join(self.destination_folder, month_and_year)
         
-        os.makedirs(self.destination_folder, exist_ok=True)
+        os.makedirs(final_file_destination, exist_ok=True)
         
         # Create full destination by joining destination_folder and file_path
         
-        destination = os.path.join(self.destination_folder, os.path.basename(file_path))
+        destination = os.path.join(final_file_destination, os.path.basename(file_path))
         
         #  Attempt to move using shutil.move
         
         try:
             shutil.move(file_path, destination)
-            print(f"Rule '{self.name}' move '{file_info.get('name')}' to {destination}")
+            logger.info(f"ExtensionRule '{self.name}' move '{file_info.get('name')}' to {destination}")
+            return True
         except Exception as e:
-            print(f"Rule '{self.name}' failed to move '{file_info.get('name')}', Error: {e}")
+            logger.error(f"ExtensionRule '{self.name}' failed to move '{file_info.get('name')}', Error: {e}")
+            return False
             
         
         
@@ -164,7 +183,7 @@ class RulesEngine:
                 # Only when rules are active
                 
                 if not rule.enabled:
-                    print(f"[SKIPPED] Rule '{rule.name}' is disabled")
+                    logger.info(f"[SKIPPED] Rule '{rule.name}' is disabled")
                     continue
                     
                     # Check if rule applies to the file and then call our method when we have a match
@@ -173,7 +192,11 @@ class RulesEngine:
                         
                     # Execute the action on the file when all criteria has been met
                         
-                    rule.apply(file_info)
+                    if rule.apply(file_info):
+                        
+                        # Move if a rule has been applied
+                        
+                        break
                         
                         
 class FallbackRule(Rule):
@@ -231,7 +254,7 @@ class FallbackRule(Rule):
             modified_time = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
             month_and_year = modified_time.strftime("%B %Y")
         except Exception as e:
-            print(f"[ERROR] FallbackRule: Unable to retrieve modification time for '{file_info.get('name')}'. Error: {e}")
+            logger.error(f"[ERROR] FallbackRule: Unable to retrieve modification time for '{file_info.get('name')}'. Error: {e}")
             return
         
         # Specify destination
@@ -247,6 +270,8 @@ class FallbackRule(Rule):
         
         try:
             shutil.move(file_path, destination)
-            print(f"Fallback to Others folder '{file_info.get('name')}' to '{destination}'")
+            logger.info(f"Fallback to Others folder '{file_info.get('name')}' to '{destination}'")
+            return True
         except Exception as e:
-            print(f"Fallback failed to move '{file_info.get('name')}'. Error: {e}")
+            logger.error(f"Fallback failed to move '{file_info.get('name')}'. Error: {e}")
+            return False
