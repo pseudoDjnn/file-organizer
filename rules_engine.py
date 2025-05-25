@@ -44,7 +44,7 @@ class Rule:
     
     
 class ExtensionRule(Rule):
-    def __init__(self, name, description, target_extension, destination_folder, enabled=True):
+    def __init__(self, name, description, target_extensions, destination_folder, enabled=True):
         """
         
         Init an extension-based rule.
@@ -56,8 +56,15 @@ class ExtensionRule(Rule):
         
         """
         super().__init__(name, description, enabled)
+        
+        # Ensure target_extensions is a list.  If a string is passed, convert it
+        
+        if isinstance(target_extensions, str):
+            target_extensions = [target_extensions]
+
         # Call new parms
-        self.target_extension = target_extension.lower()
+
+        self.target_extensions = [ext.lower() for ext in target_extensions]
         self.destination_folder = destination_folder
         
         
@@ -76,7 +83,7 @@ class ExtensionRule(Rule):
 
         file_name = file_info.get('name', '').lower()
         
-        return file_name.endswith(self.target_extension)
+        return any(file_name.endswith(ext) for ext in self.target_extensions)
     
     def apply(self, file_info):
         """
