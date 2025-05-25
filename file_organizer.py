@@ -27,55 +27,6 @@ class FileOrganizer:
         self.excluded_ext = excluded_ext
         self.year_range = year_range
         
-    # def get_year_month_subfolder(self, file_path):
-    #     """
-        
-    #     Determines the last modified year of the file.
-    #     Ensures the year falls within a valid range before categorization.
-
-    #     """
-    #     try:
-            
-    #         # Get modification time
-
-    #         modified_timestamp = os.path.getmtime(file_path)
-
-    #         # Convert to date
-
-    #         modified_date = datetime.datetime.fromtimestamp(modified_timestamp)
-    #         current_year = datetime.datetime.now().year
-            
-    #         # Ensure the file year falls within the valid YEAR_RANGE
-
-    #         if (current_year - modified_date.year) <= self.year_range:
-
-    #             # Convert month number to name
-
-    #             month_name = modified_date.strftime("%B")
-                
-    #             return f"{modified_date.year}-{month_name}"
-    #         else:
-
-    #             # Log unexpected dates instead of silently ignoring them
-
-    #             logger.info(f"Unexpected date: {modified_date.year}-{modified_date.strftime('%m')} for {file_path}")
-
-    #             # Ignore unexpected dates
-
-    #             return "Unknown"
-            
-    #     except Exception as e:
-    #         logger.error(f"Error extracting year for {file_path}: {e}")
-    #         return "Unknown"
-        
-    # def create_main_category_folders(self):
-    #     # Create category directories if they don't exist before organizing
-        
-    #     for category in self.file_categories:
-    #         folder_path = os.path.join(self.directory, category)
-    #         os.makedirs(folder_path, exist_ok=True)
-    #         logger.info(f"Ensure category folder exists: {folder_path}")
-        
     def organize_files(self):
 
         """
