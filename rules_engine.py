@@ -105,7 +105,7 @@ class ExtensionRule(Rule):
         
         file_path = file_info.get('path')
         if not file_path:
-            return False
+            return False, None
         
         # Make attempt for files epoch time modification
         
@@ -115,7 +115,7 @@ class ExtensionRule(Rule):
             logger.info(f"File '{file_info.get('name')}' modified on {modified_time} -> subfolder: {month_and_year}")
         except Exception as e:
             logger.error(f"ExtensionRule '{self.name}': Unable to retrieve modified time for '{file_info.get('name')}'.  Error: {e}")
-            return False
+            return False, None
         
         # Ensure our folder exists and create one if it doesn't; True so we don't raise an exception
         final_file_destination = os.path.join(self.destination_folder, month_and_year)
@@ -131,10 +131,10 @@ class ExtensionRule(Rule):
         try:
             shutil.move(file_path, destination)
             logger.info(f"ExtensionRule '{self.name}' move '{file_info.get('name')}' to {destination}")
-            return True
+            return True, destination
         except Exception as e:
             logger.error(f"ExtensionRule '{self.name}' failed to move '{file_info.get('name')}', Error: {e}")
-            return False
+            return False, None
             
         
         
@@ -208,6 +208,8 @@ class RulesEngine:
                                 "processed_at": datetime.datetime.now().isoformat()
                                 
                             }
+                            report_data.append(record)
+                            logger.info(F"[RECORD ADDED] Report entry added for '{file_info.get('name')}'")
                         
                         # Move if a rule has been applied
                         
@@ -261,7 +263,7 @@ class FallbackRule(Rule):
         
         file_path = file_info.get('path')
         if not file_path or not os.path.exists(file_path):
-            return
+            return False, None
         
         # Compute the year-month from the file's last modification time
         
@@ -270,7 +272,7 @@ class FallbackRule(Rule):
             month_and_year = modified_time.strftime("%B %Y")
         except Exception as e:
             logger.error(f"[ERROR] FallbackRule: Unable to retrieve modification time for '{file_info.get('name')}'. Error: {e}")
-            return
+            return False, None
         
         # Specify destination
         
@@ -286,7 +288,7 @@ class FallbackRule(Rule):
         try:
             shutil.move(file_path, destination)
             logger.info(f"Fallback to Others folder '{file_info.get('name')}' to '{destination}'")
-            return True
+            return True, destination
         except Exception as e:
             logger.error(f"Fallback failed to move '{file_info.get('name')}'. Error: {e}")
-            return False
+            return False, None

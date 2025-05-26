@@ -1,6 +1,10 @@
 import logging
+from logging_config import setup_logger
+
 from file_organizer import FileOrganizer
 from project_gui import OrganizerGUI
+
+setup_logger()
 
 # Get our logger form config
 logger = logging.getLogger(__name__)

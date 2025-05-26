@@ -100,7 +100,7 @@ class FileOrganizer:
         
         # Process all the file form the file_list using the rules engine.
         
-        engine.process_files(file_list)
+        # engine.process_files(file_list)
         
         # Create an empty list for our CSV report
         
@@ -110,6 +110,10 @@ class FileOrganizer:
         
         engine.process_files(file_list, report_data)
         
+        # Determine the desired CSV file path in the target directory
+        
+        csv_filepath = os.path.join(self.directory, "report.csv")
+        
         # Create the audit log of all files moved and save it as report.csv
         
-        generate_CSV_report(report_data, csv_filename="report.csv")
+        generate_CSV_report(report_data, csv_filename=csv_filepath)
