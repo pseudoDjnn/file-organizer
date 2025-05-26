@@ -5,6 +5,7 @@ import logging
 
 from config import FILE_CATEGORIES, EXCLUDED_ITEMS, EXCLUDED_EXT, YEAR_RANGE
 from rules_engine import RulesEngine, ExtensionRule, FallbackRule
+from report_generator import generate_CSV_report
 
 # Get a module-specific logger
 logger = logging.getLogger(__name__)
@@ -100,3 +101,15 @@ class FileOrganizer:
         # Process all the file form the file_list using the rules engine.
         
         engine.process_files(file_list)
+        
+        # Create an empty list for our CSV report
+        
+        report_data = []
+        
+        # Process all files using our 'Rules'
+        
+        engine.process_files(file_list, report_data)
+        
+        # Create the audit log of all files moved and save it as report.csv
+        
+        generate_CSV_report(report_data, csv_filename="report.csv")
