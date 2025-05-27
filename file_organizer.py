@@ -90,6 +90,8 @@ class FileOrganizer:
             
             destination_folder = os.path.join(self.directory, category)
             
+            # This can create all folders even if no file extension exists
+            
             # if not os.path.exists(destination_folder):
             #     os.makedirs(destination_folder)
             #     logger.info(f"Created folder: {destination_folder}")
