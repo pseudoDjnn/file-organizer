@@ -1,4 +1,5 @@
 # Dictionary defining file categories and their associated extensions
+
 FILE_CATEGORIES = {
     "Documents": [".pdf", ".doc", ".docx", ".txt"],
     "Pictures": [".jpg", ".jpeg", ".png", ".gif"],
@@ -11,7 +12,16 @@ FILE_CATEGORIES = {
     "Others": []
 }
 
+# Log folder for .csv and loggin report
+
+LOGS_FOLDER = "logs"
+
+# Defines how many years of files should be organized (past 5 years)
+
+YEAR_RANGE = 5
+
 # Made to not tamper with a Windows Desktop
+
 EXCLUDED_ITEMS = {
 
     # Common Windows system file
@@ -30,12 +40,7 @@ EXCLUDED_ITEMS = {
 }
 
 # File extensions we are not wanting to include
+
 EXCLUDED_EXT = {
     ".exe"
 }
-
-# Defines how many years of files should be organized (past 5 years)
-YEAR_RANGE = 5
-
-# Define log filename for review
-# LOG_FILE = "unexpected_dates.log"
