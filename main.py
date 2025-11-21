@@ -1,9 +1,8 @@
 import logging
 from logging_config import setup_logger
 
-# from file_organizer import FileOrganizer
 from services.file_organizer import FileOrganizer
-from project_gui import OrganizerGUI
+from ui.project_gui import OrganizerGUI
 
 setup_logger()
 

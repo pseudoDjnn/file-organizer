@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 
 from services.file_organizer import FileOrganizer
-from filepath_utils import FilePathUtils
+from services.filepath_utils import FilePathUtils
 
 class OrganizerGUI:
     def __init__(self):
