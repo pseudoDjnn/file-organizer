@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 
-from file_organizer import FileOrganizer
+from services.file_organizer import FileOrganizer
 from filepath_utils import FilePathUtils
 
 class OrganizerGUI:

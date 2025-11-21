@@ -1,7 +1,8 @@
 import logging
 from logging_config import setup_logger
 
-from file_organizer import FileOrganizer
+# from file_organizer import FileOrganizer
+from services.file_organizer import FileOrganizer
 from project_gui import OrganizerGUI
 
 setup_logger()
@@ -20,6 +21,7 @@ def main():
     directory_to_organize = input("Enter the directory path to organize: ")
     try:
         organizer = FileOrganizer(directory_to_organize)
+
         organizer.organize_files()
         logger.info(f"Files organized in directory: {directory_to_organize}")
     except Exception as e:
