@@ -4,7 +4,7 @@ import datetime
 import logging
 
 from config import FILE_CATEGORIES, LOGS_FOLDER, EXCLUDED_ITEMS, EXCLUDED_EXT, YEAR_RANGE
-from rules_engine import RulesEngine, ExtensionRule, FallbackRule
+from services.rules_engine import RulesEngine, ExtensionRule, FallbackRule
 from report_generator import generate_CSV_report
 
 # Get a module-specific logger
