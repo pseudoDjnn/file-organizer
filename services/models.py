@@ -3,7 +3,7 @@ import datetime
 import getpass
 
 class FileItem:
-    def __init__(self, path, owner):
+    def __init__(self, path, owner=None):
     #  Stores the full file path as string (e.g. "/home/user/photos/photo.jpg")
         self.path = path
     #  Extract just the filename (e.g. photo.jpg)
