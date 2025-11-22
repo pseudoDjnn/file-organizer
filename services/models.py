@@ -45,4 +45,5 @@ class FileItem:
         return self.created.day
     
     def __repr__(self):
-        pass
+        return (f"<FileItem name={self.name}, ext={self.extension}, >"
+                f"size={self.size}, bytes, owner={self.owner}")

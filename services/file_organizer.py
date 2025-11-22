@@ -4,6 +4,7 @@ import datetime
 import logging
 
 from config import FILE_CATEGORIES, LOGS_FOLDER, EXCLUDED_ITEMS, EXCLUDED_EXT, YEAR_RANGE
+from services.models import FileItem
 from services.rules_engine import RulesEngine, ExtensionRule, FallbackRule
 from services.report_generator import generate_CSV_report
 
@@ -45,30 +46,31 @@ class FileOrganizer:
         
         for filename in os.listdir(self.directory):
             
-            # Skip our audit report so it isn't processed by Rules
+            # # Skip our audit report so it isn't processed by Rules
             
-            if filename.lower() == "report.csv":
-                logger.info(f"Skipping audit file:  {filename}")
-                continue
+            # if filename.lower() == "report.csv":
+            #     logger.info(f"Skipping audit file:  {filename}")
+            #     continue
 
-            # Skip sys default items if needed
+            # # Skip sys default items if needed
 
-            if filename in self.excluded_items:
-                logger.info(f"Skipping excluded item: {filename}")
-                continue
+            # if filename in self.excluded_items:
+            #     logger.info(f"Skipping excluded item: {filename}")
+            #     continue
             
-            # Skip excluded file extentions
+            # # Skip excluded file extentions
 
-            if any(filename.lower().endswith(ext) for ext in self.excluded_ext):
-                logger.info(f"Skipping file with excluded extension: {filename}")
-                continue
+            # if any(filename.lower().endswith(ext) for ext in self.excluded_ext):
+            #     logger.info(f"Skipping file with excluded extension: {filename}")
+            #     continue
             
             file_path = os.path.join(self.directory, filename)
             
             # Optionally avoid processing and handling of directories
 
             if os.path.isfile(file_path):
-                files.append({'name': filename, 'path': file_path})
+                # files.append({'name': filename, 'path': file_path})
+                files.append(FileItem(file_path))
                 
         return files
     
