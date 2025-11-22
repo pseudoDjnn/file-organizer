@@ -23,5 +23,11 @@ class FileItem:
     def year_created(self):
         pass
     
+    def month_created(self):
+        pass
+    
+    def day_created(self):
+        pass
+    
     def __repr__(self):
         pass
