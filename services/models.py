@@ -21,13 +21,28 @@ class FileItem:
         self.owner = owner if owner else getpass.getuser()
         
     def year_created(self):
-        pass
+        """
+        
+        Grab the year the file was created and return it
+        
+        """
+        return self.created.year
     
     def month_created(self):
-        pass
+        """
+
+        Grab the month the file was created and return it
+        
+        """
+        return self.created.month
     
     def day_created(self):
-        pass
+        """
+
+        Grab the day the file was created and return it
+        
+        """
+        return self.created.day
     
     def __repr__(self):
         pass
