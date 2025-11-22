@@ -1,11 +1,12 @@
 import os
 import datetime
+import getpass
 
 class FileItem:
-    def __init__(self, path):
-    #  Stores the full file path as string (eg. "/home/user/photos/photo.jpg")
+    def __init__(self, path, owner):
+    #  Stores the full file path as string (e.g. "/home/user/photos/photo.jpg")
         self.path = path
-    #  Extract just the filename (eg. photo.jpg)
+    #  Extract just the filename (e.g. photo.jpg)
         self.name = os.path.basename(path)
     #  Splits our filename to the root and then makes it lowercase for ease of use
         self.extension = os.path.splitext(self.name)[1].lower()
@@ -15,6 +16,9 @@ class FileItem:
         self.created = datetime.datetime.fromtimestamp(os.path.getctime(path))
     #  Get the date last modified (Useful for rules)
         self.modified = datetime.datetime.fromtimestamp(os.path.getmtime(path))
+        
+    # Grants business like ownership (e.g. teams, projects, individuals, etc...)
+        self.owner = owner if owner else getpass.getuser()
         
     def year_created(self):
         pass
