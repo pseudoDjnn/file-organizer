@@ -28,4 +28,27 @@ def group_by_date(files, depth="month"):
     return grouped
 
 def build_destination(base_dir, file, depth="month"):
-    pass
+    """
+
+    Build the destination folder path based on owner and date
+    
+    """
+    
+#  Start with owner
+    base_dir = os.path.join(base_dir, file.owner)
+    
+#  Always include which year
+    year = str(file.year_created())
+    
+    if depth == "year":
+        return os.path.join(base_dir,year)
+    
+    month = f"{file.month_created():02d}"
+    if depth == "month":
+        return os.path.join(base_dir, year, month)
+    
+    day = f"{file.day_created():02d}"
+    if depth == "day":
+        return os.path.join(base_dir, year, month, day)
+    
+    raise ValueError(f"Unsupported depth: {depth}")
