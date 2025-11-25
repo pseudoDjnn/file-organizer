@@ -4,6 +4,8 @@ import datetime
 import logging
 
 from config import FILE_CATEGORIES, EXCLUDED_ITEMS, EXCLUDED_EXT, YEAR_RANGE
+from services.models import FileItem
+from services.rules import build_destination
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +52,7 @@ class Rule:
     
     
 class ExtensionRule(Rule):
-    def __init__(self, name, description, target_extensions, destination_folder, enabled=True):
+    def __init__(self, name, description, target_extensions, destination_folder, enabled=True, depth="month"):
         """
         
         Init an extension-based rule.
@@ -72,9 +74,11 @@ class ExtensionRule(Rule):
 
         self.target_extensions = [ext.lower() for ext in target_extensions]
         self.destination_folder = destination_folder
+        # year/month/day
+        self.depth = depth
         
         
-    def applies_to(self, file_info):
+    def applies_to(self, file: FileItem):
         """
         
         Identify name of the file using a dict.
@@ -87,11 +91,12 @@ class ExtensionRule(Rule):
         
         """
 
-        file_name = file_info.get('name', '').lower()
+        # file_name = file_info.get('name', '').lower()
         
-        return any(file_name.endswith(ext) for ext in self.target_extensions)
+        # return any(file_name.endswith(ext) for ext in self.target_extensions)
+        return file.extension in self.target_extensions
     
-    def apply(self, file_info):
+    def apply(self, file: FileItem):
         """
         
         Move the file to the designated folder.
@@ -103,39 +108,60 @@ class ExtensionRule(Rule):
         
         # Fetch the abs path of the file
         
-        file_path = file_info.get('path')
-        if not file_path:
-            return False, None
+        # file_path = file_info.get('path')
+        # if not file_path:
+        #     return False, None
         
         # Make attempt for files epoch time modification
         
-        try:
-            modified_time = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
-            month_and_year = modified_time.strftime("%B %Y")
-            logger.info(f"File '{file_info.get('name')}' modified on {modified_time} -> subfolder: {month_and_year}")
-        except Exception as e:
-            logger.error(f"ExtensionRule '{self.name}': Unable to retrieve modified time for '{file_info.get('name')}'.  Error: {e}")
-            return False, None
+        # try:
+        #     modified_time = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
+        #     month_and_year = modified_time.strftime("%B %Y")
+        #     logger.info(f"File '{file_info.get('name')}' modified on {modified_time} -> subfolder: {month_and_year}")
+        # except Exception as e:
+        #     logger.error(f"ExtensionRule '{self.name}': Unable to retrieve modified time for '{file_info.get('name')}'.  Error: {e}")
+        #     return False, None
         
-        # Ensure our folder exists and create one if it doesn't; True so we don't raise an exception
-        final_file_destination = os.path.join(self.destination_folder, month_and_year)
+        # # Ensure our folder exists and create one if it doesn't; True so we don't raise an exception
+        # final_file_destination = os.path.join(self.destination_folder, month_and_year)
         
-        os.makedirs(final_file_destination, exist_ok=True)
+        # os.makedirs(final_file_destination, exist_ok=True)
         
-        # Create full destination by joining destination_folder and file_path
+        # # Create full destination by joining destination_folder and file_path
         
-        destination = os.path.join(final_file_destination, os.path.basename(file_path))
+        # destination = os.path.join(final_file_destination, os.path.basename(file_path))
         
-        #  Attempt to move using shutil.move
+        # #  Attempt to move using shutil.move
         
-        try:
-            shutil.move(file_path, destination)
-            logger.info(f"ExtensionRule '{self.name}' move '{file_info.get('name')}' to {destination}")
-            return True, destination
-        except Exception as e:
-            logger.error(f"ExtensionRule '{self.name}' failed to move '{file_info.get('name')}', Error: {e}")
-            return False, None
+        # try:
+        #     shutil.move(file_path, destination)
+        #     logger.info(f"ExtensionRule '{self.name}' move '{file_info.get('name')}' to {destination}")
+        #     return True, destination
+        # except Exception as e:
+        #     logger.error(f"ExtensionRule '{self.name}' failed to move '{file_info.get('name')}', Error: {e}")
+        #     return False, None
             
+        try:
+            
+            #   Build the destination folder using rules.py
+            
+            destination_folder = build_destination(self.destination_folder, file, depth="month")
+            os.makedirs(destination_folder, exist_ok=True)
+            
+            #  Final location for our path
+            
+            destination = os.path.join(destination_folder, file.name)
+            
+            #  Move our file
+            
+            shutil.move(file.path, destination)
+            
+            logger.info(f"ExtensionRule '{self.name}' moved '{file.name}' to {destination}")
+            return True, destination
+        
+        except Exception as e:
+            logger.info(f"ExtensionRule '{self.name}' failed to move '{file.name}'. Error: {e} ")
+            return False, None
         
         
 class RulesEngine:
@@ -175,11 +201,11 @@ class RulesEngine:
         """
         # Iterate over each file_list
         
-        for file_info in file_list:
+        for file in file_list:
             
             # Grab the original path for creating a report
             
-            original_path = file_info.get('path')
+            original_path = file.path
             
             # Iterate over each rule of the file
             
@@ -193,15 +219,15 @@ class RulesEngine:
                     
                     # Check if rule applies to the file and then call our method when we have a match
                     
-                if rule.applies_to(file_info):
+                if rule.applies_to(file):
                         
                     # Return a tuple: (success, destination)
                     
-                    success, dest = rule.apply(file_info)
+                    success, dest = rule.apply(file)
                     if success:
                         if report_data is not None:
                             record = {
-                                "file_name": file_info.get('name'),
+                                "file_name": file.name,
                                 "original_path": original_path,
                                 "destination": dest,
                                 "rule_applied": rule.name,
@@ -209,7 +235,7 @@ class RulesEngine:
                                 
                             }
                             report_data.append(record)
-                            logger.info(F"[RECORD ADDED] Report entry added for '{file_info.get('name')}'")
+                            logger.info(F"[RECORD ADDED] Report entry added for '{file.name}'")
                         
                         # Move if a rule has been applied
                         
@@ -217,7 +243,7 @@ class RulesEngine:
                         
                         
 class FallbackRule(Rule):
-    def __init__(self, name, description, base_destination, enabled=True):
+    def __init__(self, name, description, base_destination, enabled=True, depth="month"):
         """
         
         Init fallback for files we do not look for (Others folder).
@@ -228,8 +254,9 @@ class FallbackRule(Rule):
         """
         super().__init__(name, description, enabled)
         self.base_destination = base_destination
+        self.depth = depth
         
-    def applies_to(self, file_info):
+    def applies_to(self, file: FileItem):
         """
         
         Determine if a fallback should happen to a give file.
@@ -238,14 +265,16 @@ class FallbackRule(Rule):
             file_info: dict with our metadata
             
         Returns:
-            True is we have a file that matches, False otherwise
+            True if we have a file that matches, False otherwise
         
         """
         
-        file_path = file_info.get('path')
-        return file_path is not None and os.path.exists(file_path)
+        # file_path = file_info.get('path')
+        # return file_path is not None and os.path.exists(file_path)
+        
+        return os.path.exists(file.path)
     
-    def apply(self, file_info):
+    def apply(self, file: FileItem):
         """
         
         Move the file to the fallback folder (Others folder)
@@ -261,34 +290,50 @@ class FallbackRule(Rule):
         
         """
         
-        file_path = file_info.get('path')
-        if not file_path or not os.path.exists(file_path):
-            return False, None
+        # file_path = file_info.get('path')
+        # if not file_path or not os.path.exists(file_path):
+        #     return False, None
         
-        # Compute the year-month from the file's last modification time
+        # # Compute the year-month from the file's last modification time
         
-        try:
-            modified_time = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
-            month_and_year = modified_time.strftime("%B %Y")
-        except Exception as e:
-            logger.error(f"[ERROR] FallbackRule: Unable to retrieve modification time for '{file_info.get('name')}'. Error: {e}")
-            return False, None
+        # try:
+        #     modified_time = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
+        #     month_and_year = modified_time.strftime("%B %Y")
+        # except Exception as e:
+        #     logger.error(f"[ERROR] FallbackRule: Unable to retrieve modification time for '{file_info.get('name')}'. Error: {e}")
+        #     return False, None
         
-        # Specify destination
+        # # Specify destination
         
-        destination_folder = os.path.join(self.base_destination, "Others", month_and_year)
-        os.makedirs(destination_folder, exist_ok=True)
+        # destination_folder = os.path.join(self.base_destination, "Others", month_and_year)
+        # os.makedirs(destination_folder, exist_ok=True)
         
-        # Full destination path with our folder name
+        # # Full destination path with our folder name
         
-        destination = os.path.join(destination_folder, os.path.basename(file_path))
+        # destination = os.path.join(destination_folder, os.path.basename(file_path))
 
-        # try/except to move the file
+        # # try/except to move the file
+        
+        # try:
+        #     shutil.move(file_path, destination)
+        #     logger.info(f"Fallback to Others folder '{file_info.get('name')}' to '{destination}'")
+        #     return True, destination
+        # except Exception as e:
+        #     logger.error(f"Fallback failed to move '{file_info.get('name')}'. Error: {e}")
+        #     return False, None
         
         try:
-            shutil.move(file_path, destination)
-            logger.info(f"Fallback to Others folder '{file_info.get('name')}' to '{destination}'")
+            #   Builddestination path using rules.py logic
+            
+            base_dir = os.path.join(self.base_destination, "Others")
+            destination_folder = build_destination(base_dir, file, depth=self.depth)
+            os.makedirs(destination_folder, exist_ok=True)
+            
+            destination = os.path.join(destination_folder, file.name)
+            shutil.move(file.path, destination)
+            
+            logger.info(f"FallbackRule moved '{file.name}' to '{destination}'")
             return True, destination
         except Exception as e:
-            logger.error(f"Fallback failed to move '{file_info.get('name')}'. Error: {e}")
+            logger.info(f"FallbackRule failed to move '{file.name}'.  Error: {e}")
             return False, None
