@@ -256,7 +256,7 @@ class FallbackRule(Rule):
         """
                 
         try:
-            #   Builddestination path using rules.py logic
+            #   Build destination path using rules.py logic
             
             base_dir = os.path.join(self.base_destination, "Others")
             destination_folder = build_destination(base_dir, file, depth=self.depth)
