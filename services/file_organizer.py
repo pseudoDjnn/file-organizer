@@ -46,30 +46,12 @@ class FileOrganizer:
         
         for filename in os.listdir(self.directory):
             
-            # # Skip our audit report so it isn't processed by Rules
-            
-            # if filename.lower() == "report.csv":
-            #     logger.info(f"Skipping audit file:  {filename}")
-            #     continue
-
-            # # Skip sys default items if needed
-
-            # if filename in self.excluded_items:
-            #     logger.info(f"Skipping excluded item: {filename}")
-            #     continue
-            
-            # # Skip excluded file extentions
-
-            # if any(filename.lower().endswith(ext) for ext in self.excluded_ext):
-            #     logger.info(f"Skipping file with excluded extension: {filename}")
-            #     continue
-            
             file_path = os.path.join(self.directory, filename)
             
             # Optionally avoid processing and handling of directories
 
             if os.path.isfile(file_path):
-                # files.append({'name': filename, 'path': file_path})
+                # 
                 files.append(FileItem(file_path))
                 
         return files
@@ -91,12 +73,6 @@ class FileOrganizer:
             # Determine the destination folder for the category
             
             destination_folder = os.path.join(self.directory, category)
-            
-            # This can create all folders even if no file extension exists
-            
-            # if not os.path.exists(destination_folder):
-            #     os.makedirs(destination_folder)
-            #     logger.info(f"Created folder: {destination_folder}")
             
             # Create an Extension that accepts a list of extension for this category
             
