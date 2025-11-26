@@ -22,7 +22,7 @@ class Rule:
         self.description = description
         self.enabled = enabled
         
-    def applies_to(self, file_info):
+    def applies_to(self):
         """
         
         Make a determination whether the reule applies to the given file.
@@ -38,7 +38,7 @@ class Rule:
         
         raise NotImplementedError("This method must be overridden by subclasses.")
     
-    def apply(self, file_info):
+    def apply(self):
         """
         
         Carry out the action of the rule method above on the file.
@@ -105,42 +105,7 @@ class ExtensionRule(Rule):
             file_info: Out dict with the metadata
         
         """
-        
-        # Fetch the abs path of the file
-        
-        # file_path = file_info.get('path')
-        # if not file_path:
-        #     return False, None
-        
-        # Make attempt for files epoch time modification
-        
-        # try:
-        #     modified_time = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
-        #     month_and_year = modified_time.strftime("%B %Y")
-        #     logger.info(f"File '{file_info.get('name')}' modified on {modified_time} -> subfolder: {month_and_year}")
-        # except Exception as e:
-        #     logger.error(f"ExtensionRule '{self.name}': Unable to retrieve modified time for '{file_info.get('name')}'.  Error: {e}")
-        #     return False, None
-        
-        # # Ensure our folder exists and create one if it doesn't; True so we don't raise an exception
-        # final_file_destination = os.path.join(self.destination_folder, month_and_year)
-        
-        # os.makedirs(final_file_destination, exist_ok=True)
-        
-        # # Create full destination by joining destination_folder and file_path
-        
-        # destination = os.path.join(final_file_destination, os.path.basename(file_path))
-        
-        # #  Attempt to move using shutil.move
-        
-        # try:
-        #     shutil.move(file_path, destination)
-        #     logger.info(f"ExtensionRule '{self.name}' move '{file_info.get('name')}' to {destination}")
-        #     return True, destination
-        # except Exception as e:
-        #     logger.error(f"ExtensionRule '{self.name}' failed to move '{file_info.get('name')}', Error: {e}")
-        #     return False, None
-            
+                    
         try:
             
             #   Build the destination folder using rules.py
@@ -289,39 +254,7 @@ class FallbackRule(Rule):
             file_info: dict using metadata
         
         """
-        
-        # file_path = file_info.get('path')
-        # if not file_path or not os.path.exists(file_path):
-        #     return False, None
-        
-        # # Compute the year-month from the file's last modification time
-        
-        # try:
-        #     modified_time = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
-        #     month_and_year = modified_time.strftime("%B %Y")
-        # except Exception as e:
-        #     logger.error(f"[ERROR] FallbackRule: Unable to retrieve modification time for '{file_info.get('name')}'. Error: {e}")
-        #     return False, None
-        
-        # # Specify destination
-        
-        # destination_folder = os.path.join(self.base_destination, "Others", month_and_year)
-        # os.makedirs(destination_folder, exist_ok=True)
-        
-        # # Full destination path with our folder name
-        
-        # destination = os.path.join(destination_folder, os.path.basename(file_path))
-
-        # # try/except to move the file
-        
-        # try:
-        #     shutil.move(file_path, destination)
-        #     logger.info(f"Fallback to Others folder '{file_info.get('name')}' to '{destination}'")
-        #     return True, destination
-        # except Exception as e:
-        #     logger.error(f"Fallback failed to move '{file_info.get('name')}'. Error: {e}")
-        #     return False, None
-        
+                
         try:
             #   Builddestination path using rules.py logic
             
